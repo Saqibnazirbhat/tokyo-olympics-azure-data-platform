@@ -186,14 +186,3 @@ make test        # pytest + coverage (incl. local Spark tests)
 | `athletes_by_country` | Athlete headcount and discipline breadth per country |
 | `country_performance` | **Medals per 100 athletes** — joins medals × squad size for an efficiency metric the original analysis never produced |
 
----
-
-### What changed from the original
-
-This repository began as the classic single-notebook tutorial: one Databricks
-notebook that mounted ADLS with **inline (empty) credentials**, used
-`inferSchema`, performed two ad-hoc queries, wrote headered CSV, and shipped with
-an empty README and no tests. It has been re-engineered into the modular,
-tested, config-driven, CI/CD-deployed platform documented above. See
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the rationale behind each
-decision.
