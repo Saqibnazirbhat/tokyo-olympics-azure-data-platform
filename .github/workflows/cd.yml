@@ -1,0 +1,37 @@
+name: CD (deploy to Databricks)
+
+# Deploys the Databricks Asset Bundle on every GitHub Release.
+# - a pre-release publishes to the `dev` target,
+# - a full release publishes to `prod`.
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy bundle
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.release.prerelease && 'dev' || 'prod' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build wheel
+        run: python -m pip install build && python -m build --wheel
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy & run bundle
+        env:
+          # Configure these as GitHub environment secrets (dev / prod).
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+          TARGET: ${{ github.event.release.prerelease && 'dev' || 'prod' }}
+        run: |
+          databricks bundle validate -t "$TARGET"
+          databricks bundle deploy -t "$TARGET"
