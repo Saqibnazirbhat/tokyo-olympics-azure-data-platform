@@ -1,0 +1,68 @@
+# Databricks Asset Bundle (DAB) — declarative deployment of the pipeline as a
+# scheduled Databricks Job. Deploy with:  databricks bundle deploy -t <target>
+# Run on demand with:                      databricks bundle run tokyo_medallion_job -t <target>
+bundle:
+  name: tokyo-olympics-dataeng
+
+variables:
+  node_type:
+    description: Worker node SKU.
+    default: Standard_DS3_v2
+
+artifacts:
+  python_wheel:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
+resources:
+  jobs:
+    tokyo_medallion_job:
+      name: "[${bundle.target}] Tokyo Olympics Medallion Pipeline"
+      tags:
+        project: tokyo-olympics
+        managed_by: databricks-asset-bundles
+      job_clusters:
+        - job_cluster_key: medallion_cluster
+          new_cluster:
+            spark_version: 14.3.x-scala2.12
+            node_type_id: ${var.node_type}
+            autoscale:
+              min_workers: 1
+              max_workers: 4
+            spark_conf:
+              spark.databricks.delta.optimizeWrite.enabled: "true"
+              spark.databricks.delta.autoCompact.enabled: "true"
+      tasks:
+        - task_key: run_medallion
+          job_cluster_key: medallion_cluster
+          python_wheel_task:
+            package_name: tokyo_olympics
+            entry_point: tokyo-pipeline
+            parameters: ["--env", "${bundle.target}"]
+          libraries:
+            - whl: ./dist/*.whl
+      schedule:
+        # 06:00 UTC daily. PAUSED in dev, UNPAUSED in prod (see targets).
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: UTC
+        pause_status: PAUSED
+      email_notifications:
+        on_failure: ["data-eng-alerts@example.com"]
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-0000000000000000.0.azuredatabricks.net
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-1111111111111111.1.azuredatabricks.net
+    resources:
+      jobs:
+        tokyo_medallion_job:
+          schedule:
+            pause_status: UNPAUSED
