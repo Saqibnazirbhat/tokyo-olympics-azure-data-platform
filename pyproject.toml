@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tokyo-olympics-dataeng"
+version = "1.0.0"
+description = "Enterprise medallion-architecture data pipeline for Tokyo 2020 Olympics data on Azure Databricks."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Data Engineering Team" }]
+keywords = ["azure", "databricks", "pyspark", "delta-lake", "medallion", "etl"]
+
+dependencies = [
+    "pyspark>=3.4,<3.6",
+    "delta-spark>=2.4,<3.3",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+    "black>=24.0",
+    "mypy>=1.8",
+    "types-PyYAML>=6.0",
+    "pre-commit>=3.5",
+]
+
+[project.scripts]
+tokyo-pipeline = "tokyo_olympics.pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tokyo_olympics = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --cov=tokyo_olympics --cov-report=term-missing"
+markers = [
+    "spark: tests that require a local Spark session (slower).",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = ["N812"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+files = ["src"]

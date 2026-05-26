@@ -1,0 +1,6 @@
+# Normalise line endings to LF in the repo (CI runs on Linux).
+* text=auto eol=lf
+
+# Treat data and notebooks as-is.
+*.csv text eol=lf
+*.ipynb text eol=lf

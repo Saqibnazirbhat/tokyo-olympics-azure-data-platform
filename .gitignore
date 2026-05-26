@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Spark / Delta local artifacts
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+_delta_log/
+data/bronze/
+data/silver/
+data/gold/
+
+# Secrets & local env (NEVER commit credentials)
+.env
+*.pem
+*.key
+.databricks/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
