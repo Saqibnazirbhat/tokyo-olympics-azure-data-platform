@@ -1,0 +1,11 @@
+# Production environment — Azure Databricks against ADLS Gen2.
+storage:
+  use_local: false
+  account_name: "tokyoolympicdata"
+  container: "tokyo-olympic-data"
+
+spark:
+  shuffle_partitions: 64
+
+data_quality:
+  fail_fast: true

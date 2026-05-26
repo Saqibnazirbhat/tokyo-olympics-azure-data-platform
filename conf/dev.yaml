@@ -1,0 +1,11 @@
+# Local / development environment.
+# Runs entirely against the sample CSVs in ./data — no Azure required.
+storage:
+  use_local: true
+  local_root: "./data"
+
+spark:
+  shuffle_partitions: 4
+
+data_quality:
+  fail_fast: false

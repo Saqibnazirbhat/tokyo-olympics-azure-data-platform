@@ -1,0 +1,52 @@
+# Base configuration shared by all environments.
+# Environment files (dev.yaml, prod.yaml) are deep-merged on top of this,
+# and environment variables prefixed with TOKYO_ override the result.
+spark:
+  app_name: "tokyo-olympics-medallion"
+  shuffle_partitions: 8
+
+storage:
+  account_name: "tokyoolympicdata"
+  container: "tokyo-olympic-data"
+  # When true, all layers read/write from `local_root` instead of ADLS Gen2.
+  use_local: false
+  local_root: "./data"
+
+# Relative path of each medallion layer within the container / local root.
+layers:
+  raw: "raw-data"
+  bronze: "bronze"
+  silver: "silver"
+  gold: "gold"
+
+# Source datasets. `raw_file` is the file name expected in the raw zone.
+# `encoding` defaults to UTF-8; several source files are ISO-8859 and must be
+# read as such to avoid mojibake (e.g. "Côte d'Ivoire").
+datasets:
+  athletes:
+    raw_file: "Athletes.csv"
+    encoding: "ISO-8859-1"
+  coaches:
+    raw_file: "Coaches.csv"
+    encoding: "ISO-8859-1"
+  entriesgender:
+    raw_file: "EntriesGender.csv"
+    encoding: "UTF-8"
+  medals:
+    raw_file: "Medals.csv"
+    encoding: "UTF-8"
+  teams:
+    raw_file: "Teams.csv"
+    encoding: "ISO-8859-1"
+
+# Databricks secret scope (Key Vault backed) holding the ADLS service principal.
+secrets:
+  scope: "tokyo-olympics"
+  tenant_id_key: "adls-tenant-id"
+  client_id_key: "adls-client-id"
+  client_secret_key: "adls-client-secret"
+
+# Behaviour of the data-quality gate.
+data_quality:
+  # If true, a failed critical check aborts the pipeline; if false it only warns.
+  fail_fast: true
